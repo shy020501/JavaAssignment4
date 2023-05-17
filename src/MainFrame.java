@@ -3,6 +3,7 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,10 +16,20 @@ public class MainFrame extends JFrame {
 
     private boolean enableDisplay = true;
 
+    private int getFiboNum(int n)
+    {
+        if(n == 0) return 0;
+        else if(n == 1 || n == 2) return 1;
+        else
+        {
+            return getFiboNum(n - 1) + getFiboNum(n - 2);
+        }
+    }
+
     private boolean isValidInput(String userInput)
     {
         boolean valid = false;
-        String regex = "^[0-9]"; // Format of user input
+        String regex = "[0-9]+"; // Format of user input (only digits)
         Pattern pat = Pattern.compile(regex); // Compile regular expression to pattern
         Matcher mat = pat.matcher(userInput); // Check if pattern matches the user input
         if(mat.matches()) // If so, check if the number comes into the range between 3 and 20
@@ -127,18 +138,105 @@ public class MainFrame extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 cancelButton.setEnabled(true); // Enable cancel button when sum button has been pressed
                 String userInput = userInputField.getText(); // Get user input from userInputField
+                String fiboList = "";
+                File file = new File("src/fibo.txt");
                 if(isValidInput(userInput)) // If the user input is valid
                 {
+                    int count = 0;
+                    if(enableDisplay) { // Runs only when display is enabled
+                        // Initialize progress bar
+                        progressBar.setValue(0);
+                        progressBar.setStringPainted(true);
 
+                        cancelButton.setEnabled(true); // Enable cancel button
+
+                        int num = Integer.parseInt(userInput);
+
+                        // Thread to print in file
+                        Thread thread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // TODO Auto-generated method stub
+                                String result = ""; // Stores fibonacci sequence (as String)
+                                for(int i = 0; i < num; i++) {
+                                    result += (String.valueOf(getFiboNum(i)) + "\n"); // Get each fibonacci number
+
+                                    try {
+                                        Thread.sleep(50); // Sleep for 50 milliseconds
+                                    } catch (InterruptedException e) {
+                                        // TODO Auto-generated catch block
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                try {
+                                    // Write the result in file
+                                    FileOutputStream fileOutputStream = new FileOutputStream("src/fibo.txt");
+                                    PrintWriter writer = new PrintWriter(fileOutputStream);
+                                    writer.println(result);
+                                    writer.close();
+                                    fileOutputStream.close();
+
+                                } catch (IOException e1) {
+                                    // TODO Auto-generated catch block
+                                    e1.printStackTrace();
+                                }
+                            }
+                        });
+
+
+                        // Thread to print sum in application
+                        Thread thread2 = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                int progressPerNumber = 100 / num; // Stores how much progress should increase when one fibonacci number is found
+                                int progressTotal = progressPerNumber;
+
+                                String result = ""; // Stores fibonacci sequences (as String)
+
+                                for(int i = 0; i < num; i++) {
+                                    result += String.valueOf(getFiboNum(i)) + "\n"; // Get each fibonacci number
+                                    screen.setText(result); // Show fibonacci sequence to screen
+
+                                    try {
+                                        Thread.sleep(50);
+                                    } catch (InterruptedException e) {
+                                        // TODO Auto-generated catch block
+                                        e.printStackTrace();
+                                    }
+
+                                    // Set progress bar
+                                    progressBar.setValue(progressTotal);
+                                    progressTotal += progressPerNumber;
+                                }
+
+                                progressBar.setValue(progressTotal);
+                                progressTotal += progressPerNumber;
+
+                                // Calculate sum of fibonacci sequence
+                                long sum = 0;
+                                for(int i = 0; i < num; i++) {
+                                    sum += getFiboNum(i);
+                                }
+                                sumLabel.setText("Sum = " + sum); // Set sum text to sum value
+                                cancelButton.setEnabled(false); // Disable cancel button when the program stops running
+                            }
+                        });
+
+                        // Multi-threading
+                        thread.start();
+                        thread2.start();
+                    }
+                    cancelButton.setEnabled(false); // Disable cancel button
+                    enableDisplay = true; // Display is enabled
                 }
                 else
                 {
-                    userInputField.setText("");
+                    userInputField.setText(""); // Clear the screen
                     JOptionPane.showMessageDialog(null, "Enter valid input!", "Warning", JOptionPane.INFORMATION_MESSAGE); // Show error messages
                 }
             }
         });
-
         add(sumButton);
 
         // Settings for frame
