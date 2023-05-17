@@ -45,18 +45,24 @@ public class MainFrame extends JFrame {
     public MainFrame()
     {
         JTextArea screen = new JTextArea(); // Text area that shows fibonacci sequence
-        JScrollPane scrollPane = new JScrollPane(screen); // Add scroll bar to screen
+        JScrollPane scrollPane = new JScrollPane(screen, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER); // Add scroll bar to screen
         screen.setFont(plainFont); // Set font of the screen
         screen.setMargin( new Insets(10,10,10,10) );
         screen.setEditable(false);
-        // Set bounds for the text area with respect to frame size
+//         Set bounds for the text area with respect to frame size
         screen.setBounds(
-                0,
+                5,
                 frameSize[1] / 12,
                 frameSize[0] / 1,
                 frameSize[1] * 9 / 12
         );
-        add(screen);
+//        add(screen);
+        scrollPane.setBounds(
+                0,
+                frameSize[1] / 12,
+                frameSize[0] * 195 / 200,
+                frameSize[1] * 9 / 12);
+        add(scrollPane);
 
         JLabel numLabel = new JLabel("Number of row in Fibonacci series: "); // Store label for inputting number instruction
         numLabel.setFont(boldFont); // Set font of the num label
