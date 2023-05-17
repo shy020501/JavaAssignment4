@@ -138,70 +138,67 @@ public class MainFrame extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 cancelButton.setEnabled(true); // Enable cancel button when sum button has been pressed
                 String userInput = userInputField.getText(); // Get user input from userInputField
-                String fiboList = "";
-                File file = new File("src/fibo.txt");
+                enableDisplay = true; // Display is enabled
                 if(isValidInput(userInput)) // If the user input is valid
                 {
                     int count = 0;
-                    if(enableDisplay) { // Runs only when display is enabled
-                        // Initialize progress bar
-                        progressBar.setValue(0);
-                        progressBar.setStringPainted(true);
 
-                        cancelButton.setEnabled(true); // Enable cancel button
+                    // Initialize progress bar
+                    progressBar.setValue(0);
+                    progressBar.setStringPainted(true);
 
-                        int num = Integer.parseInt(userInput);
+                    int num = Integer.parseInt(userInput);
 
-                        // Thread to print in file
-                        Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                // TODO Auto-generated method stub
-                                String result = ""; // Stores fibonacci sequence (as String)
-                                for(int i = 0; i < num; i++) {
+                    // Thread to print in file
+                    Thread thread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String result = ""; // Stores fibonacci sequence (as String)
+                            for (int i = 0; i < num; i++) {
+                                if (enableDisplay) { // Runs only when display is enabled
                                     result += (String.valueOf(getFiboNum(i)) + "\n"); // Get each fibonacci number
 
                                     try {
                                         Thread.sleep(50); // Sleep for 50 milliseconds
                                     } catch (InterruptedException e) {
-                                        // TODO Auto-generated catch block
                                         e.printStackTrace();
                                     }
                                 }
-
-                                try {
-                                    // Write the result in file
-                                    FileOutputStream fileOutputStream = new FileOutputStream("src/fibo.txt");
-                                    PrintWriter writer = new PrintWriter(fileOutputStream);
-                                    writer.println(result);
-                                    writer.close();
-                                    fileOutputStream.close();
-
-                                } catch (IOException e1) {
-                                    // TODO Auto-generated catch block
-                                    e1.printStackTrace();
-                                }
                             }
-                        });
+
+                            try {
+                                // Write the result in file
+                                FileOutputStream fileOutputStream = new FileOutputStream("src/fibo.txt");
+                                PrintWriter writer = new PrintWriter(fileOutputStream);
+                                writer.println(result);
+                                writer.close();
+                                fileOutputStream.close();
+
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            }
+                        }
+                    });
 
 
-                        // Thread to print sum in application
-                        Thread thread2 = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                int progressPerNumber = 100 / num; // Stores how much progress should increase when one fibonacci number is found
-                                int progressTotal = progressPerNumber;
+                    // Thread to print sum in application
+                    Thread thread2 = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
 
-                                String result = ""; // Stores fibonacci sequences (as String)
+                            int progressPerNumber = (100 + num - 1) / num; // Stores how much progress should increase when one fibonacci number is found (round up)
+                            int progressTotal = progressPerNumber;
 
-                                for(int i = 0; i < num; i++) {
+                            String result = ""; // Stores fibonacci sequences (as String)
+
+                            for (int i = 0; i < num; i++) {
+                                if (enableDisplay) { // Runs only when display is enabled
                                     result += String.valueOf(getFiboNum(i)) + "\n"; // Get each fibonacci number
                                     screen.setText(result); // Show fibonacci sequence to screen
 
                                     try {
                                         Thread.sleep(50);
                                     } catch (InterruptedException e) {
-                                        // TODO Auto-generated catch block
                                         e.printStackTrace();
                                     }
 
@@ -209,26 +206,28 @@ public class MainFrame extends JFrame {
                                     progressBar.setValue(progressTotal);
                                     progressTotal += progressPerNumber;
                                 }
+                            }
 
-                                progressBar.setValue(progressTotal);
-                                progressTotal += progressPerNumber;
+                            progressBar.setValue(progressTotal);
+                            progressTotal += progressPerNumber;
 
+
+                            if(enableDisplay) { // Runs only when display is enabled
                                 // Calculate sum of fibonacci sequence
                                 long sum = 0;
-                                for(int i = 0; i < num; i++) {
+                                for (int i = 0; i < num; i++) {
                                     sum += getFiboNum(i);
                                 }
                                 sumLabel.setText("Sum = " + sum); // Set sum text to sum value
-                                cancelButton.setEnabled(false); // Disable cancel button when the program stops running
-                            }
-                        });
 
-                        // Multi-threading
-                        thread.start();
-                        thread2.start();
-                    }
-                    cancelButton.setEnabled(false); // Disable cancel button
-                    enableDisplay = true; // Display is enabled
+                                cancelButton.setEnabled(false); // Disable cancel button
+                            }
+                        }
+                    });
+
+                    // Multi-threading
+                    thread.start();
+                    thread2.start();
                 }
                 else
                 {
