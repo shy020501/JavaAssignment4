@@ -33,8 +33,10 @@ public class FiboMultiThread extends Thread{
                 writer.close();
             } catch (InterruptedException e1)
             {
+                System.out.printf("Thread Error");
                 e1.printStackTrace(); // Error handling for joining thread
             } catch (IOException e2) {
+                System.out.printf("FileWriter Error");
                 e2.printStackTrace(); // Error handling for file I/O
             }
         }
