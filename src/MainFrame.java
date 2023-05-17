@@ -153,10 +153,13 @@ public class MainFrame extends JFrame {
                     Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            String result = ""; // Stores fibonacci sequence (as String)
+                            String result = "["; // Stores fibonacci sequence (as String)
                             for (int i = 0; i < num; i++) {
                                 if (enableDisplay) { // Runs only when display is enabled
-                                    result += (String.valueOf(getFiboNum(i)) + "\n"); // Get each fibonacci number
+                                    result += String.valueOf(getFiboNum(i)); // Get each fibonacci number
+
+                                    if(i != num - 1) result += ", ";
+                                    else result += "]";
 
                                     try {
                                         Thread.sleep(50); // Sleep for 50 milliseconds
