@@ -28,17 +28,20 @@ public class FiboMultiThread extends Thread{
                 th1.join();
                 th2.join();
                 answer = th1.answer + th2.answer;
-                BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-                writer.write(String.valueOf(answer) + "\n");
-                writer.close();
-            } catch (InterruptedException e1)
-            {
+            } catch (InterruptedException e1) {
                 System.out.printf("Thread Error");
                 e1.printStackTrace(); // Error handling for joining thread
-            } catch (IOException e2) {
-                System.out.printf("FileWriter Error");
-                e2.printStackTrace(); // Error handling for file I/O
             }
+        }
+
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.append(String.valueOf(answer));
+            writer.append("\n");
+            writer.close();
+        } catch (IOException e2) {
+            System.out.printf("FileWriter Error");
+            e2.printStackTrace(); // Error handling for file I/O
         }
     }
 }
